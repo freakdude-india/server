@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Video Player with Tailwind CSS</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #video-container {
+           width: 100%;
+            position: relative;
+        }
+
+        #subtitle-container {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="video-container" class="max-w-full">
+        <video id="video-player" class="w-full" controls autoplay preload="auto">
+            <source src="https://cdn.seedhost.online/download/Skyfall.2012.1080p.BrRip.x264.YIFY.mp4?magnetLink=magnet%3A%3Fxt%3Durn%3Abtih%3A188AA63C64E1D6B64B74F5BE36CB9244C08A3456%26dn%3DSkyfall%2B%25282012%2529%2B1080p%2BBrRip%2Bx264%2B-%2BYIFY%26tr%3Dhttp%253A%252F%252Fp4p.arenabg.com%253A1337%252Fannounce%26tr%3Dudp%253A%252F%252F47.ip-51-68-199.eu%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252F9.rarbg.me%253A2780%252Fannounce%26tr%3Dudp%253A%252F%252F9.rarbg.to%253A2710%252Fannounce%26tr%3Dudp%253A%252F%252F9.rarbg.to%253A2730%252Fannounce%26tr%3Dudp%253A%252F%252F9.rarbg.to%253A2920%252Fannounce%26tr%3Dudp%253A%252F%252Fopen.stealth.si%253A80%252Fannounce%26tr%3Dudp%253A%252F%252Fopentracker.i2p.rocks%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.coppersurfer.tk%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.cyberia.is%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.dler.org%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.internetwarriors.net%253A1337%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.leechers-paradise.org%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.openbittorrent.com%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.opentrackr.org%253A1337%26tr%3Dudp%253A%252F%252Ftracker.pirateparty.gr%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.tiny-vps.com%253A6969%252Fannounce%26tr%3Dudp%253A%252F%252Ftracker.torrent.eu.org%253A451%252Fannounce" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="subtitle-container"></div>
+    </div>
+
+    <script>
+        const videoPlayer = document.getElementById('video-player');
+        const subtitleContainer = document.getElementById('subtitle-container');
+
+        videoPlayer.addEventListener('timeupdate', updateSubtitle);
+
+        fetch('your-subtitle.vtt')
+            .then(response => response.text())
+            .then(subtitleText => {
+                const subtitleData = parseSrt(subtitleText);
+                displaySubtitle(subtitleData);
+            });
+
+        function parseSrt(srtText) {
+            const subtitleEntries = srtText.trim().split(/\n\s*\n/);
+            return subtitleEntries.map(entry => {
+                const [index, time, text] = entry.split(/\n/);
+                const [start, end] = time.split(' --> ');
+                return {
+                    index: index,
+                    start: convertSrtTimeToSeconds(start),
+                    end: convertSrtTimeToSeconds(end),
+                    text: text,
+                };
+            });
+        }
+
+        function convertSrtTimeToSeconds(time) {
+            const [hours, minutes, seconds] = time.split(':').map(parseFloat);
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+
+        function updateSubtitle() {
+            const currentTime = videoPlayer.currentTime;
+            const currentSubtitle = subtitles.find(subtitle =>
+                currentTime >= subtitle.start && currentTime <= subtitle.end
+            );
+
+            if (currentSubtitle) {
+                subtitleContainer.textContent = currentSubtitle.text;
+                subtitleContainer.style.display = 'block';
+            } else {
+                subtitleContainer.style.display = 'none';
+            }
+        }
+
+        function displaySubtitle(subtitleData) {
+            subtitles = subtitleData;
+        }
+    </script>
+
+</body>
+
+</html>
